@@ -13,6 +13,10 @@ typedef struct {
     memory_block ** blocks;
 }block_table;
 
-block_table * create_block_table(number_of_blocks);
-
+block_table * create_block_table(int number_of_blocks);
+void delete_block_table(block_table * table);
+int write_from_file_to_block(FILE * file_name, block_table * table);
+void count_words(FILE * output_file_name, char * file_name, int name_length);
+void remove_blocks(block_table * table, int block_index);
+void print_all_blocks(block_table * table);
 #endif //LAB1_LIBBLCKMEM_H

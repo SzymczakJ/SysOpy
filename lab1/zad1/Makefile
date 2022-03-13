@@ -1,13 +1,14 @@
-blckmem.o: blckmem.c blckmem.h
-	gcc -c blckmem.c
+CC = gcc -Wall
 
-libblckmem.a: blckmem.o
+static:
+	$(CC) -c blckmem.c
 	ar rcs libblckmem.a blckmem.o
 
-libblckmem.so: blckmem.c blckmem.h
-	gcc -fPIC -c blckmem.c
-	gcc -shared blckmem.o -o libblckmem.so
+shared:
+	$(CC) -c fPIC blckmem.c
+	$(CC) -shared -fPIC -o blckmem.so blckmem.o
 
 clean:
 	rm -f *.o
 	rm -f *.a
+	rm -f *.so
