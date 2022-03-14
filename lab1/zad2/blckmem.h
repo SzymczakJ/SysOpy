@@ -13,6 +13,7 @@ typedef struct {
     memory_block ** blocks;
 }block_table;
 
+void show_pwd();
 block_table * create_block_table(int number_of_blocks);
 void delete_block_table(block_table * table);
 int write_from_file_to_block(FILE * file_name, block_table * table);

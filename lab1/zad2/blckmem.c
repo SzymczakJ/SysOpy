@@ -3,6 +3,7 @@
 #include <string.h>
 #include <malloc.h>
 
+
 block_table * create_block_table(int number_of_blocks) {
     block_table * new_table = calloc(sizeof(memory_block), 1);
     new_table->number_of_blocks = number_of_blocks;
@@ -16,12 +17,12 @@ void remove_blocks(block_table * table, int block_index) {
     memory_block * block = table->blocks[block_index];
     free(block->wc_results);
     free(block);
+    table->blocks[block_index] = 0;
 }
 
 void count_words(FILE * output_file, char * file_names, int names_length) {
     char * command = calloc(sizeof(char), 4 + names_length);
     char * wc_res = calloc(sizeof(char), names_length + 500);
-
     sprintf(command, "wc %s",file_names);
 
     FILE * pf = popen(command,"r");

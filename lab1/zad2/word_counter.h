@@ -4,7 +4,8 @@
 
 #ifndef LAB1_WORD_COUNTER_H
 #define LAB1_WORD_COUNTER_H
-
+void wc_test();
+void save_and_delete_test();
 int main();
 block_table * parse_create_table(block_table * table, char * token);
 int is_integer(char * string);

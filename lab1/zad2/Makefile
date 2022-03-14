@@ -2,12 +2,17 @@ CC=gcc
 CFLAGS=-Wall -Wno-unused-variable
 
 static:
-	make -C ../zad1 static
+	$(CC) -c blckmem.c
+	ar rcs libblckmem.a blckmem.o
 
 clean:
-	make -C ../zad1 clean
-	rm -f .o word_counter
+	rm -f *.o *.a word_counter main report2.txt
 
 test: static
-	$(CC) $(CFLAGS) word_counter.c -I../zad1 -lblckmem -L../zad1 -D PERFORMANCE_TESTS -o word_counter
+	gcc word_counter.c -I../zad1 -lblckmem -L../zad2 -D TEST -o word_counter
+	make report
 
+report:
+	rm -f ./report2.txt
+	@printf "Word count test:\n" 2>/dev/null >> report2.txt
+	./word_counter 2>/dev/null >> report2.txt
