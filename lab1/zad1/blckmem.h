@@ -3,16 +3,17 @@
 #include <stddef.h>
 #include <stdio.h>
 
-typedef struct {
+struct memory_block {
     size_t result_size;
     char * wc_results;
-}memory_block;
+};
 
-typedef struct {
+struct block_table {
     size_t number_of_blocks;
     memory_block ** blocks;
-}block_table;
+};
 
+void show_pwd();
 block_table * create_block_table(int number_of_blocks);
 void delete_block_table(block_table * table);
 int write_from_file_to_block(FILE * file_name, block_table * table);
