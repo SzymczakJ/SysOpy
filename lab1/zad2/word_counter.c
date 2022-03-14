@@ -1,12 +1,38 @@
 #include "stdio.h"
 #include "stdlib.h"
-#include "blckmem.h"
 #include "string.h"
-#include "word_counter.h"
 #include "ctype.h"
 #include <sys/times.h>
 #include <stdint.h>
 #include <unistd.h>
+
+#ifdef LIB_DYNAMIC
+#include <dlfcn.h>
+#else
+#include "blckmem.h"
+#endif
+
+#ifdef LIB_DYNAMIC
+        void *handle = dlopen("libblckmem.so", RTLD_LAZY);
+
+        typedef struct {
+        size_t result_size;
+        char * wc_results;
+        }memory_block;
+
+        typedef struct {
+        size_t number_of_blocks;
+        memory_block ** blocks;
+        }block_table;
+        block_table* (*create_block_table)(int) = (block_table (*)(int)) dlsym(handle, "create_block_table");
+        void (*count_words)(FILE*, char*, int) = (void (*) (FILE*, char*, int)) dlsym(handle, "count_words");
+        int (*write_from_file_to_block)(FILE*, block_table*) = (int(*)(FILE*, block_table*)) dlsym(handle, "write_from_file_to_block");
+        void (*delete_block_table)(block_table*) = (void(*)(block_table*)) dlsym(handle, "delete_block_table");
+        void (*remove_blocks)(block_table*, int) = (void(*)(block_table*, int)) dlsym(handle, "remove_blocks");
+        void (*print_all_blocks)(block_table*) = (void(*)(block_table*)) dlsym(handle, "print_all_blocks");
+
+#endif
+
 clock_t clock_t_begin, clock_t_end;
 struct tms times_start_buffer, times_end_buffer;
 
@@ -27,6 +53,60 @@ void print_times(){
            calc_time(clock_t_begin, clock_t_end),
            calc_time(times_start_buffer.tms_cutime, times_end_buffer.tms_cutime),
            calc_time(times_start_buffer.tms_cstime, times_end_buffer.tms_cstime));
+}
+
+
+int is_integer(char * string) {
+    while (*string != 0x0) {
+        if (!isdigit(*(string++))) return 0;
+    }
+    return 1;
+}
+
+block_table * parse_create_table(block_table * table, char * token) {
+    token = strtok(NULL, " ");
+    if (token == NULL || !is_integer(token)) {
+        puts("Invalid parameter.");
+    }
+    else {
+        if (table != NULL) {
+            delete_block_table(table);
+        }
+        table = create_block_table(atoi(token));
+    }
+    return table;
+}
+
+void parse_remove_block(block_table * table, char * token) {
+    token = strtok(NULL, " ");
+    if (table == NULL) puts("Table hasn't been created yet.");
+    if (token == NULL) puts("Invalid parameter.");
+    else remove_blocks(table, atoi(token));
+}
+
+void parse_wc_files(block_table * table, char * token) {
+    token = strtok(NULL, "\n");
+    puts(token);
+    if (token == NULL) {
+        puts("Invalid parameter.");
+        return;
+    }
+    FILE * temp_file = tmpfile();
+    count_words(temp_file, token, strlen(token));
+    int block_index = write_from_file_to_block(temp_file, table);
+    char index_info[50];
+#ifndef TEST
+    sprintf(index_info, "Allocated block on index: %d", block_index);
+    puts(index_info);
+#endif
+    return;
+}
+
+
+
+
+void parse_print_blocks(block_table * table) {
+    print_all_blocks(table);
 }
 
 void wc_test() {
@@ -115,12 +195,6 @@ void few_saves_deletes_test() {
             "wc_files text_files/medium_file text_files/semi_medium_file",
             "wc_files text_files/semi_large_file text_files/large_file text_files/super_large_file",
             "wc_files text_files/semi_large_file text_files/large_file text_files/super_large_file text_files/medium_file text_files/semi_medium_file text_files/empty_file text_files/super_small_file text_files/small_file"};
-    char * file_comments[] = {
-            "small files:",
-            "medium files:",
-            "large files:",
-            "all files:"
-    };
 
     char parse_helper[500];
     start_timer();
@@ -140,59 +214,6 @@ void few_saves_deletes_test() {
     }
     stop_timer();
     print_times();
-}
-
-int is_integer(char * string) {
-    while (*string != 0x0) {
-        if (!isdigit(*(string++))) return 0;
-    }
-    return 1;
-}
-
-block_table * parse_create_table(block_table * table, char * token) {
-    token = strtok(NULL, " ");
-    if (token == NULL || !is_integer(token)) {
-        puts("Invalid parameter.");
-    }
-    else {
-        if (table != NULL) {
-            delete_block_table(table);
-        }
-        table = create_block_table(atoi(token));
-    }
-    return table;
-}
-
-void parse_remove_block(block_table * table, char * token) {
-    token = strtok(NULL, " ");
-    if (table == NULL) puts("Table hasn't been created yet.");
-    if (token == NULL) puts("Invalid parameter.");
-    else remove_blocks(table, atoi(token));
-}
-
-void parse_wc_files(block_table * table, char * token) {
-    token = strtok(NULL, "\n");
-    puts(token);
-    if (token == NULL) {
-        puts("Invalid parameter.");
-        return;
-    }
-    FILE * temp_file = tmpfile();
-    count_words(temp_file, token, strlen(token));
-    int block_index = write_from_file_to_block(temp_file, table);
-    char index_info[50];
-#ifndef TEST
-    sprintf(index_info, "Allocated block on index: %d", block_index);
-    puts(index_info);
-#endif
-    return;
-}
-
-
-
-
-void parse_print_blocks(block_table * table) {
-    print_all_blocks(table);
 }
 
 
@@ -219,4 +240,7 @@ int main(int argc, char** argv) {
         else puts("invalid command");
     }
     if (table != NULL) delete_block_table(table);
+#ifdef LIB_DYNAMIC
+    dlclose(handle);
+#endif
 }
