@@ -35,9 +35,9 @@ test: clean
 	make shared
 	make report
 
-#	printf "dynamic:\n" $(REPORT_CMD)
-#	make dynamic
-#	make report
+	printf "dynamic:\n" $(REPORT_CMD)
+	make dynamic
+	make report
 
 
 report:

@@ -9,6 +9,7 @@ shared:
 	$(CC) -c -fPIC blckmem.c
 	$(CC) -shared -fPIC -o blckmem.so blckmem.o
 
+
 clean:
 	rm -f *.o *.a word_counter report2.txt *.so
 
