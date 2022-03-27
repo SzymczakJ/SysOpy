@@ -1,0 +1,10 @@
+Jeden proces liczący
+real 0.030000s user 0.020000s sys 0.000000s
+Dwa procesy liczące
+real 0.010000s user 0.020000s sys 0.000000s
+Cztery procesy liczące
+real 0.010000s user 0.020000s sys 0.000000s
+Osiem procesów liczących
+real 0.010000s user 0.030000s sys 0.000000s
+Dwanaście procesów liczących
+real 0.010000s user 0.050000s sys 0.000000s
