@@ -98,6 +98,7 @@ int main(int argc, char **argv) {
     }
 
     send(senderPid, SIGUSR2, mode, 0);
+    blockSIGUSRs();
     receivedUSR2 = 0;
     setSignals(recvHandler);
     while(!receivedUSR2) {

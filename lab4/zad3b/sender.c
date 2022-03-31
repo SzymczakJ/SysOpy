@@ -104,6 +104,7 @@ int main(int argc, char **argv) {
 
     for (int i = 0; i <numberOfSignals; i++) {
         send(catcherPid, SIGUSR1, mode, 0);
+        waitForSIGUSR(1, 0);
     }
 
     puts("End of transmission.");
