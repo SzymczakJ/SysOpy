@@ -1,0 +1,4 @@
+Wnioski:
+-ustawienia mask i ignore są dziedziczone, zarówno w for jak i w exec
+-fork dziedziczy signal handler, a exec ustawia signal handler na domyślny(po otrzymaniu sygnału SIGUSR1 program się kończy)
+-oczekujące sygnały są "czyszczone" przez fork, więc sygnały maskowane przed forkiem nie są widoczne w dzieciach
