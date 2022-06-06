@@ -1,0 +1,1 @@
+Zarówno dla wartości M,N < 5 jak i (>5) program działa poprawnie.
